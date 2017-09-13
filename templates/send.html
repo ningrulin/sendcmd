@@ -1,0 +1,16 @@
+$def with (a, b, c)
+
+<form method="post" action="/send">
+	<p>
+		本端SN号码：$a
+        本端发送命令：<input type="text" name="loc_send"   value="test" size="512"/>
+        <input type="submit" value="发送命令" />
+    </p>
+
+    <p>
+        远端SN号码：$b
+        本端接收命令：
+    $for recv in c:
+       $recv
+	</p>
+</form>
