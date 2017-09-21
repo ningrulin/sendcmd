@@ -58,39 +58,7 @@ class send:
         ws.sub_handler(ws.on_recv)
         session.rom_recv.append(cc)
         return render.send(session.SN_local_ID, session.SN_romate_ID, session.rom_recv)        
-        """
-        try:
-            print "1"
-            ws = wsclient.WebSocketClient(aa, bb)
-            print "2"
-            ws.setDaemon(True)
-            print "3"
-            ws.start()
-            print "4"
-            time.sleep(2)
-            ws.on_send(session.use_obj.romet_id, hh)
-            print "5"
-            ws.add_handler(ws.on_recv)
-            time_out = 5
-            while time_out:
-                if ws.result != None:
-                    break
-                time.sleep(1)
-                time_out -= 1
 
-            dd_show = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
-            if ws.result == None:
-                r_show = "未回到回应"
-            else:
-                r_show = ws.result
-
-            cc = str(dd_show) + "  发送: " + str(hh.decode('utf-8')) + "    接收： " + str(r_show)
-            #cc = "aaa"
-            ws.sub_handler(ws.on_recv)
-            session.rom_recv.append(cc)
-            return render.send(session.SN_local_ID, session.SN_romate_ID, session.rom_recv)
-        except:
-            return render.send(session.SN_local_ID, session.SN_romate_ID, session.rom_recv)"""
 
 class code:
     def GET(self):

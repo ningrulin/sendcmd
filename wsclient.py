@@ -15,6 +15,59 @@ import requests
 import base64
 import constant
 import websocket
+import hashlib
+import pymysql.cursors
+import logging
+
+
+
+
+
+###SQLconfig
+configYNsifa = {
+    'host': '116.52.253.210',
+    'port': 3306,
+    'user': 'root',
+    'password': 'QWerASdf12#$',
+    'db': 'mxsuser',
+    'charset': 'utf8mb4',
+    'cursorclass': pymysql.cursors.DictCursor,
+}
+configPublic = {
+    'host': 'rds94shy9735xhk329mvpublic.mysql.rds.aliyuncs.com',
+    'port': 3306,
+    'user': 'mxsuser',
+    'password': 'mxspassword',
+    'db': 'mxsuser',
+    'charset': 'utf8mb4',
+    'cursorclass': pymysql.cursors.DictCursor,
+}
+
+# Connect to the database
+#connection = pymysql.connect(**configPublic)
+connection = pymysql.connect(**configYNsifa)
+
+
+# do sql
+
+def get_remote_id(remote_sn):
+
+    try:
+        with connection.cursor() as cursor:
+            # search
+            sql = 'SELECT userEntity_userID FROM mxsuser.account WHERE NAME =' + remote_sn
+            cursor.execute(sql)
+            # get result
+            result = cursor.fetchone()
+            userid = result['userEntity_userID']
+            print (userid)
+        # commit
+        connection.commit()
+
+    finally:
+        connection.close()
+
+    return userid
 
 class WebSocketClient(threading.Thread):
     def __init__(self, user_num, basic_token):
@@ -158,58 +211,91 @@ class User_info(object):
         self.local_sn = local_sn
         self.romet_sn = romte_sn
 
+
     def login(self):
-        url1 = constant.HTTP_LOGIN + "/cas/v1/tickets"
-        data = "username=" + self.local_sn + "&password=" + self.local_sn + "&type=MOBILE"
-        r1 = requests.post(url=url1, data=data)
-        if r1.status_code != 201:
-            return False
-        # 2.st
-        url2 = r1.headers['LOCATION']
-        data = "service=" + constant.HTTP_LOGIN + "/sch/v1/tokens/android,2.3.3"
-        r2 = requests.post(url=url2, data=data)
-        if r2.status_code != 200:
-            return False
-        # 3.token
-        url3 = constant.HTTP_LOGIN + "/sch/v1/tokens/android,2.3.3?ticket=" + r2.text
-        r3 = requests.post(url=url3)
-        if r3.status_code != 200:
-            return False
-        # 4.basetoken
-        session_token = json.loads(r3.text)["token"]
-        aa = str(time.time())
-        cc = aa.split('.')[1]
-        if len(cc) < 1:
-            cc = cc + "000"
-        elif len(cc) < 2:
-            cc = cc + "00"
-        else:
-            cc = cc + "0"
-        time_cc = aa.split('.')[0] + cc
+        url = constant.HTTP_LOGIN + "/mhauth/login"
 
-        session_token = session_token + ":" + time_cc
-        base_token = "Basic " + base64.b64encode(session_token)
-        self.token = base_token
-
-        #5.local_info
-        url = constant.HTTP_URL + "/cxf/security/persons/" + self.local_sn
-        headers = {"Content-Type": "application/json; charset=utf-8",
-                   "authorization": base_token}
-        rr = requests.get(url=url, headers=headers)
-        if rr.status_code != 200:
-            return False
-        self.local_id = json.loads(rr.text)["userID"]
-
-       #6. romote_info
-        url = constant.HTTP_URL + "/cxf/security/persons/" + self.romet_sn
-        headers = {"Content-Type": "application/json; charset=utf-8",
-                   "authorization": base_token}
-        rr = requests.get(url=url, headers=headers)
-        if rr.status_code != 200:
+        data = {"username": self.local_sn,
+                "type": "phone",
+                "appkey": "10011801",
+                "tstpass": "6666"}
+        data = json.dumps(data)
+        headers = {"Host": constant.HTTP_URL,
+                   "Content-Type": "text/html; charset=utf-8"}
+        r = requests.post(url, headers=headers, data=data)
+        if r.status_code != 401:
             return False
 
-        self.romet_id = json.loads(rr.text)["userID"]
+        # get the dict mm = {"nonce": value1, "Digest realm": value2}
+        c1 = r.headers
+        dd = c1["Www-Authenticate"]
+        kk = dd.split(',')
+        mm = {}
+        tt0 = kk[0].split('=')[0].strip()
+        len1 = len(kk[0].split('=')[1].strip())
+        mm.update({tt0: kk[0].split('=')[1].strip()[1:len1 - 1]})
+        tt1 = kk[1].split('=')[0].strip()
+        len2 = len(kk[1].split('=')[1].strip())
+        mm.update({tt1: kk[1].split('=')[1].strip()[1:len2 - 1]})
+
+        # start md5,get respone
+        u_name = self.local_sn
+
+        cc = mm['nonce']
+        pwd = "6666"
+        ha1_str = u_name + ":" + mm['Digest realm'] + ":" + pwd
+        has1 = hashlib.md5()
+        has1.update(ha1_str)
+        HA1 = has1.hexdigest()
+
+        ha2_str = HA1 + mm['nonce']
+        has2 = hashlib.md5()
+        has2.update(ha2_str)
+        HA2 = has2.hexdigest()
+
+        # get service_token
+        auth_str = "Digest username=" + "\"" + u_name + "\"" + ',' + 'realm=' + "\"" + mm['Digest realm'] + "\"" + "," + \
+                   "nonce=" + "\"" + mm['nonce'] + "\"" + ',' + 'response=' + "\"" + HA2 + "\""
+        headers = {"Host": constant.HTTP_URL,
+                   "authorization": auth_str,
+                   "Content-Type": "text/html; charset=utf-8"}
+
+        r = requests.post(url, headers=headers)
+        if r.status_code != 200:
+            return False
+
+        print r.text
+
+
+        # get basetoken
+        service_token = json.loads(r.text)["token"]
+        time_stamp = str(int(round(time.time() * 1000)))
+        self.token = 'Basic ' + base64.b64encode(service_token + ":" + time_stamp + ":" + "v1")
+
+        print self.token
+
+        # get local_id
+
+        url = constant.HTTP_LOGIN + "/mhauth/account"
+        headers = {"Host": constant.HTTP_URL,
+                   'authorization': self.token,
+                   "Content-Type": "application/json; charset=utf-8"}
+        data = {
+            "version": "3.3.0"
+        }
+        data = json.dumps(data)
+        r = requests.post(url, headers=headers, data=data)
+        self.local_id = json.loads(r.text)["userid"]
+        re_sn = self.romet_sn
+        re_id = get_remote_id(re_sn)
+        self.romet_id = re_id
         return True
+
+        #get remote_id
+
+
+
+
 
 def main():
     user_in = User_info("008613025411186", "502718100004")
