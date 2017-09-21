@@ -44,8 +44,8 @@ configPublic = {
 }
 
 # Connect to the database
-#connection = pymysql.connect(**configPublic)
-connection = pymysql.connect(**configYNsifa)
+connection = pymysql.connect(**configPublic)
+#connection = pymysql.connect(**configYNsifa)
 
 
 # do sql
@@ -216,11 +216,10 @@ class User_info(object):
         url = constant.HTTP_LOGIN + "/mhauth/login"
 
         data = {"username": self.local_sn,
-                "type": "phone",
-                "appkey": "10011801",
-                "tstpass": "6666"}
+                "type": "box",
+                "appkey": "10011801",}
         data = json.dumps(data)
-        headers = {"Host": constant.HTTP_URL,
+        headers = {"Host": constant.HTTP_CAS_URL,
                    "Content-Type": "text/html; charset=utf-8"}
         r = requests.post(url, headers=headers, data=data)
         if r.status_code != 401:
@@ -242,7 +241,7 @@ class User_info(object):
         u_name = self.local_sn
 
         cc = mm['nonce']
-        pwd = "6666"
+        pwd = cc[int(u_name[4])] + cc[int(u_name[5])] + cc[int(u_name[6])] + cc[int(u_name[7])] + cc[int(u_name[8])] + cc[int(u_name[9])] + cc[int(u_name[10])] + cc[int(u_name[11])]
         ha1_str = u_name + ":" + mm['Digest realm'] + ":" + pwd
         has1 = hashlib.md5()
         has1.update(ha1_str)
@@ -256,7 +255,7 @@ class User_info(object):
         # get service_token
         auth_str = "Digest username=" + "\"" + u_name + "\"" + ',' + 'realm=' + "\"" + mm['Digest realm'] + "\"" + "," + \
                    "nonce=" + "\"" + mm['nonce'] + "\"" + ',' + 'response=' + "\"" + HA2 + "\""
-        headers = {"Host": constant.HTTP_URL,
+        headers = {"Host": constant.HTTP_CAS_URL,
                    "authorization": auth_str,
                    "Content-Type": "text/html; charset=utf-8"}
 
@@ -276,7 +275,7 @@ class User_info(object):
 
         # get local_id
 
-        url = constant.HTTP_LOGIN + "/mhauth/account"
+        url = constant.HTTP_CAS + "/mhauth/account"
         headers = {"Host": constant.HTTP_URL,
                    'authorization': self.token,
                    "Content-Type": "application/json; charset=utf-8"}
@@ -298,7 +297,7 @@ class User_info(object):
 
 
 def main():
-    user_in = User_info("008613025411186", "502718100004")
+    user_in = User_info("502725100024", "502718100004")
     if user_in.login():
         ws = WebSocketClient(user_in.local_id, user_in.token)
         ws.setDaemon(True)
