@@ -1,4 +1,3 @@
-
 import pymysql.cursors
 ###URLS
 WS_URL = "ws://mxcloud.meetsoon.net/push/subscribe"
@@ -8,8 +7,10 @@ HTTP_LOGIN = "http://mxcloud.meetsoon.net"
 HTTP_CAS_URL = "cas.meetsoon.net"
 
 # WS_URL = "ws://116.52.253.210:9999/push/subscribe"
-# HTTP_LOGIN = "http://116.52.253.210:9999"
+# HTTP_CAS = "http://116.52.253.210:9999"
 # HTTP_URL= "116.52.253.210:9999"
+# HTTP_LOGIN = "http://116.52.253.210:9999"
+# HTTP_CAS_URL = "116.52.253.210:9999"
 
 
 ###SQLconfig
@@ -36,9 +37,7 @@ configPublic = {
 connection = pymysql.connect(**configPublic)
 #connection = pymysql.connect(**configYNsifa)
 
-
 # do sql
-
 def get_remote_id(remote_sn):
 
     try:
@@ -52,10 +51,8 @@ def get_remote_id(remote_sn):
             print (userid)
         # commit
         connection.commit()
-
     finally:
         connection.close()
-
     return userid
 
 
