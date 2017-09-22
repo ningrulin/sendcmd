@@ -16,58 +16,8 @@ import base64
 import constant
 import websocket
 import hashlib
-import pymysql.cursors
-import logging
 
 
-
-
-
-###SQLconfig
-configYNsifa = {
-    'host': '116.52.253.210',
-    'port': 3306,
-    'user': 'root',
-    'password': 'QWerASdf12#$',
-    'db': 'mxsuser',
-    'charset': 'utf8mb4',
-    'cursorclass': pymysql.cursors.DictCursor,
-}
-configPublic = {
-    'host': 'rds94shy9735xhk329mvpublic.mysql.rds.aliyuncs.com',
-    'port': 3306,
-    'user': 'mxsuser',
-    'password': 'mxspassword',
-    'db': 'mxsuser',
-    'charset': 'utf8mb4',
-    'cursorclass': pymysql.cursors.DictCursor,
-}
-
-# Connect to the database
-#connection = pymysql.connect(**configPublic)
-connection = pymysql.connect(**configYNsifa)
-
-
-# do sql
-
-def get_remote_id(remote_sn):
-
-    try:
-        with connection.cursor() as cursor:
-            # search
-            sql = 'SELECT userEntity_userID FROM mxsuser.account WHERE NAME =' + remote_sn
-            cursor.execute(sql)
-            # get result
-            result = cursor.fetchone()
-            userid = result['userEntity_userID']
-            print (userid)
-        # commit
-        connection.commit()
-
-    finally:
-        connection.close()
-
-    return userid
 
 class WebSocketClient(threading.Thread):
     def __init__(self, user_num, basic_token):
@@ -287,14 +237,11 @@ class User_info(object):
         r = requests.post(url, headers=headers, data=data)
         self.local_id = json.loads(r.text)["userid"]
         re_sn = self.romet_sn
-        re_id = get_remote_id(re_sn)
+        re_id = constant.get_remote_id(re_sn)
         self.romet_id = re_id
         return True
 
         #get remote_id
-
-
-
 
 
 def main():
