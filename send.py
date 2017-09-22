@@ -67,7 +67,7 @@ class code:
         session.SN_local_token = ""
         session.SN_romate_ID = ""
         session.rom_recv = []
-        info_show = "欢迎使用结果查询！"
+        info_show = "现网环境--欢迎使用结果查询！"
         return render.code(info_show)
 
 class login:
