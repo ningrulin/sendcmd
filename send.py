@@ -4,7 +4,7 @@ import time
 import sys
 reload(sys)
 sys.setdefaultencoding('utf-8')
-sys.path.append("/var/www/sendcmd")
+sys.path.append("/var/www/YNsifaSendCmd")
 import web
 import wsclient
 web.config.debug = False
@@ -16,8 +16,8 @@ urls = (
 
 app = web.application(urls, globals())
 application = app.wsgifunc()
-session = web.session.Session(app, web.session.DiskStore('/var/www/sendcmd/sessions/'), initializer={'SN_local_ID': "", "SN_local_token": "", "SN_romate_ID": "", "rom_recv": [], "use_obj" : None})
-render = web.template.render('/var/www/sendcmd/templates/')
+session = web.session.Session(app, web.session.DiskStore('/var/www/YNsifaSendCmd/sessions/'), initializer={'SN_local_ID': "", "SN_local_token": "", "SN_romate_ID": "", "rom_recv": [], "use_obj" : None})
+render = web.template.render('/var/www/YNsifaSendCmd/templates/')
 
 class recv:
     def GET(self):
