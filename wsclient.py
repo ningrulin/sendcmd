@@ -166,7 +166,7 @@ class User_info(object):
         url = constant.HTTP_LOGIN + "/mhauth/login"
 
         data = {"username": self.local_sn,
-                "type": "phone",
+                "type": "box",
                 "appkey": "10011801"}
         data = json.dumps(data)
         headers = {"Host": constant.HTTP_CAS_URL,

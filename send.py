@@ -4,7 +4,7 @@ import time
 import sys
 reload(sys)
 sys.setdefaultencoding('utf-8')
-sys.path.append("/var/www/YNsifaSendCmd")
+sys.path.append("/var/www/SDsifaSendCmd")
 import web
 import wsclient
 web.config.debug = False
@@ -16,8 +16,8 @@ urls = (
 
 app = web.application(urls, globals())
 application = app.wsgifunc()
-session = web.session.Session(app, web.session.DiskStore('/var/www/YNsifaSendCmd/sessions/'), initializer={'SN_local_ID': "", "SN_local_token": "", "SN_romate_ID": "", "rom_recv": [], "use_obj" : None})
-render = web.template.render('/var/www/YNsifaSendCmd/templates/')
+session = web.session.Session(app, web.session.DiskStore('/var/www/SDsifaSendCmd/sessions/'), initializer={'SN_local_ID': "", "SN_local_token": "", "SN_romate_ID": "", "rom_recv": [], "use_obj" : None})
+render = web.template.render('/var/www/SDsifaSendCmd/templates/')
 
 class recv:
     def GET(self):
@@ -67,7 +67,7 @@ class code:
         session.SN_local_token = ""
         session.SN_romate_ID = ""
         session.rom_recv = []
-        info_show = "云南司法环境--欢迎使用结果查询！"
+        info_show = "山东司法环境--欢迎使用结果查询！"
         return render.code(info_show)
 
 class login:

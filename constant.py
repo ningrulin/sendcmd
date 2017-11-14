@@ -5,11 +5,20 @@ import pymysql.cursors
 # HTTP_LOGIN = "http://cas.meetsoon.net"
 # HTTP_URL= "http://mxcloud.meetsoon.net"
 
-WS_URL = "ws://116.52.253.210:9999/push/subscribe"
-HTTP_CAS = "http://116.52.253.210:9999"
-HTTP_URL= "116.52.253.210:9999"
-HTTP_LOGIN = "http://116.52.253.210:9999"
-HTTP_CAS_URL = "116.52.253.210:9999"
+# WS_URL = "ws://116.52.253.210:9999/push/subscribe"
+# HTTP_CAS = "http://116.52.253.210:9999"
+# HTTP_URL= "116.52.253.210:9999"
+# HTTP_LOGIN = "http://116.52.253.210:9999"
+# HTTP_CAS_URL = "116.52.253.210:9999"
+
+###SD urls
+
+WS_URL = "ws://120.78.185.81:9999/push/subscribe"
+HTTP_CAS = "http://120.78.185.81:9999"
+HTTP_URL= "120.78.185.81:9999"
+HTTP_LOGIN = "http://120.78.185.81:9999"
+HTTP_CAS_URL = "120.78.185.81:9999"
+
 
 configYNsifa = {
     'host': '116.52.253.210',
@@ -29,10 +38,22 @@ configPublic = {
     'charset': 'utf8mb4',
     'cursorclass': pymysql.cursors.DictCursor,
 }
+configSDsifa = {
+    'host': '120.78.185.81',
+    'port': 3306,
+    'user': 'root',
+    'password': 'alskPJQ98on',
+    'db': 'mxsuser',
+    'charset': 'utf8mb4',
+    'cursorclass': pymysql.cursors.DictCursor,
+}
+
 
 # Connect to the database
 #connection = pymysql.connect(**configPublic)
-connection = pymysql.connect(**configYNsifa)
+#connection = pymysql.connect(**configYNsifa)
+connection = pymysql.connect(**configSDsifa)
+
 
 # do sql
 def get_remote_id(remote_sn):
